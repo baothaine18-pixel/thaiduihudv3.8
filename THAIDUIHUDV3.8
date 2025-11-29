@@ -1,23 +1,25 @@
 --========================================================--
---========  THAIDUI HUB V3.9 – TẢI SCRIPT TỰ ĐỘNG  =======--
+--======  THAIDUI HUB V3.10 – TĂNG CƯỜNG TƯƠNG THÍCH =======--
 --========================================================--
--- Dựa trên V3.3 (UI tự viết ổn định)
--- Cập nhật ScriptStore + Tự động Fetch (Tải) Code khi chọn Script
+-- Fix: Tối ưu hóa cách lấy PlayerGui và sử dụng print/warn thay cho Log (để tránh lỗi nếu hàm Log bị hỏng)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
+
+-- Sử dụng cách tham chiếu trực tiếp PlayerGui
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui = LocalPlayer.PlayerGui or LocalPlayer:WaitForChild("PlayerGui")
+
 
 -- CONFIG
-local UI_NAME = "THAIDUI_V3_9"
+local UI_NAME = "THAIDUI_V3_10"
 local TOGGLE_KEY = Enum.KeyCode.K
 local DEFAULT_THEME = {
-    Primary = Color3.fromRGB(56,20,100), -- purple mid
-    Accent  = Color3.fromRGB(170,84,255), -- purple light
+    Primary = Color3.fromRGB(56,20,100), 
+    Accent  = Color3.fromRGB(170,84,255),
     Text    = Color3.fromRGB(240,240,255),
     Bg      = Color3.fromRGB(12,8,20)
 }
@@ -38,7 +40,7 @@ local function New(class, props)
 end
 
 -- ===================================
--- 📚 ScriptStore (DANH SÁCH CẬP NHẬT)
+-- 📚 ScriptStore (DANH SÁCH CẬP NHẬT TỪ V3.9)
 -- ===================================
 local ScriptStore = {
     -- 💎 BLOX FRUITS
@@ -68,12 +70,11 @@ local ScriptStore = {
 
 local Theme = { Primary=DEFAULT_THEME.Primary, Accent=DEFAULT_THEME.Accent, Text=DEFAULT_THEME.Text, Bg=DEFAULT_THEME.Bg }
 
--- Save/Load helpers (Giữ nguyên)
+-- Save/Load helpers
 local function ExportScripts()
     local ok, txt = pcall(function() return HttpService:JSONEncode(ScriptStore) end)
     if ok then return txt else return nil end
 end
-
 local function ImportScripts(json)
     local ok, tbl = pcall(function() return HttpService:JSONDecode(json) end)
     if ok and type(tbl)=="table" then
@@ -83,7 +84,7 @@ local function ImportScripts(json)
     return false
 end
 
--- Build ScreenGui (Giữ nguyên)
+-- Build ScreenGui 
 local screenGui = New("ScreenGui", {Name = UI_NAME, Parent = PlayerGui, ResetOnSpawn=false, ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
 local Lighting = game:GetService("Lighting")
 local blur = Lighting:FindFirstChild("THAIDUI_Blur")
@@ -100,9 +101,9 @@ New("UIStroke", {Parent = Main, Color = Theme.Primary, Transparency = 0.85, Thic
 Main.Active = true
 Main.Draggable = true
 
--- Top title + glowing text (Giữ nguyên)
-local Title = New("TextLabel", {Parent = Main, Size = UDim2.new(1,0,0,56), BackgroundTransparency=1, Text="THAIDUI V3.9", Font=Enum.Font.GothamBlack, TextSize=26, TextColor3=Theme.Text, ZIndex=51, TextXAlignment=Enum.TextXAlignment.Left, Position=UDim2.new(0,20,0,12)})
-local Sub = New("TextLabel", {Parent = Main, Size = UDim2.new(1,-40,0,18), Position = UDim2.new(0,20,0,42), BackgroundTransparency=1, Text="Ổn định • Tải Code Tự Động • Toggle K", Font=Enum.Font.Code, TextSize=12, TextColor3=Theme.Text})
+-- Top title + glowing text 
+local Title = New("TextLabel", {Parent = Main, Size = UDim2.new(1,0,0,56), BackgroundTransparency=1, Text="THAIDUI V3.10", Font=Enum.Font.GothamBlack, TextSize=26, TextColor3=Theme.Text, ZIndex=51, TextXAlignment=Enum.TextXAlignment.Left, Position=UDim2.new(0,20,0,12)})
+local Sub = New("TextLabel", {Parent = Main, Size = UDim2.new(1,-40,0,18), Position = UDim2.new(0,20,0,42), BackgroundTransparency=1, Text="Fix Tương Thích • Tải Code Tự Động • Toggle K", Font=Enum.Font.Code, TextSize=12, TextColor3=Theme.Text})
 local glow = New("TextLabel", {Parent = Main, Size=Title.Size, Position=Title.Position, BackgroundTransparency=1, Text=Title.Text, Font=Title.Font, TextSize=Title.TextSize, TextColor3=Theme.Accent, TextTransparency=1})
 task.spawn(function()
     while true do
@@ -114,7 +115,7 @@ task.spawn(function()
     end
 end)
 
--- Left: Game list (Giữ nguyên)
+-- Left: Game list 
 local left = New("Frame", {Parent = Main, Size = UDim2.new(0,220,1,-80), Position = UDim2.new(0,20,0,80), BackgroundTransparency=1})
 New("UICorner", {Parent = left, CornerRadius = UDim.new(0,10)})
 local leftTitle = New("TextLabel", {Parent = left, Size=UDim2.new(1,0,0,22), BackgroundTransparency=1, Text="Games", Font=Enum.Font.GothamBold, TextSize=14, TextColor3=Theme.Text, TextXAlignment=Enum.TextXAlignment.Left})
@@ -141,18 +142,18 @@ local function RefreshGameButtons()
     end
 end
 
--- Right content: script list + editor + controls (Giữ nguyên)
+-- Right content: script list + editor + controls 
 local right = New("Frame", {Parent = Main, Size = UDim2.new(1,-280,1,-80), Position = UDim2.new(0,240,0,80), BackgroundTransparency=1})
 New("UICorner", {Parent = right, CornerRadius = UDim.new(0,10)})
 local scriptList = New("ScrollingFrame", {Parent = right, Size=UDim2.new(0.36,0,1,0), Position=UDim2.new(0,0,0,0), CanvasSize=UDim2.new(0,0,0,0), ScrollBarThickness=8, BackgroundTransparency=1})
 local listLayout = New("UIListLayout", {Parent = scriptList, Padding=UDim.new(0,8)})
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 local editor = New("Frame", {Parent = right, Size = UDim2.new(0.64, -12, 1, 0), Position = UDim2.new(0.36, 12, 0, 0), BackgroundTransparency=1})
-local nameBox = New("TextBox", {Parent = editor, Size = UDim2.new(1,0,0,30), Position=UDim2.new(0,0,0,0), PlaceholderText="Script name", ClearTextOnFocus=false, Text=""})
+local nameBox = New("TextBox", {Parent = editor, Size = UDim2.new(1,0,0,30), Position=UDim2.new(0,0,0,0), PlaceholderText="Script name", ClearTextOnFocus=false, Text="", BackgroundColor3=Color3.fromRGB(15,10,30)})
 New("UICorner", {Parent = nameBox, CornerRadius=UDim.new(0,6)})
-local linkBox = New("TextBox", {Parent = editor, Size = UDim2.new(1,0,0,28), Position=UDim2.new(0,0,0,36), PlaceholderText="Optional link (http/https)", ClearTextOnFocus=false, Text=""})
+local linkBox = New("TextBox", {Parent = editor, Size = UDim2.new(1,0,0,28), Position=UDim2.new(0,0,0,36), PlaceholderText="Optional link (http/https)", ClearTextOnFocus=false, Text="", BackgroundColor3=Color3.fromRGB(15,10,30)})
 New("UICorner", {Parent = linkBox, CornerRadius=UDim.new(0,6)})
-local codeBox = New("TextBox", {Parent = editor, Size = UDim2.new(1,0,1,-140), Position=UDim2.new(0,0,0,72), MultiLine=true, TextWrapped=true, ClearTextOnFocus=false, Font=Enum.Font.Code, Text="", BackgroundColor3=Color3.fromRGB(10,10,14), TextColor3=Theme.Text})
+local codeBox = New("TextBox", {Parent = editor, Size = UDim2.new(1,0,1,-140), Position=UDim2.new(0,0,0,72), MultiLine=true, TextWrapped=true, ClearTextOnFocus=false, Font=Enum.Font.Code, Text="", BackgroundColor3=Color3.fromRGB(10,10,14), TextColor3=Theme.Text, TextSize=12})
 New("UICorner", {Parent = codeBox, CornerRadius=UDim.new(0,8)})
 local btnFetch = New("TextButton", {Parent = editor, Size = UDim2.new(0,140,0,34), Position=UDim2.new(0,0,1,-56), Text="Fetch Link → Editor", BackgroundColor3=Theme.Primary, Font=Enum.Font.GothamBold, TextColor3=Theme.Text})
 New("UICorner", {Parent = btnFetch, CornerRadius=UDim.new(0,6)})
@@ -171,14 +172,14 @@ local function AutoFetchScript(lk)
         local ok, res = pcall(function() return game:HttpGet(lk) end)
         if ok and res and res ~= "" then
             codeBox.Text = res
-            warn("Auto-Fetched content into editor (review before Execute).")
+            warn("Auto-Fetched content into editor (review before Execute).") -- Sử dụng warn
         else
             codeBox.Text = "-- [ERROR] Failed to Auto-Fetch URL or empty content. Paste code manually."
-            warn("Failed to Auto-Fetch URL or empty content.")
+            warn("Failed to Auto-Fetch URL or empty content.") -- Sử dụng warn
         end
     else
         codeBox.Text = "-- No valid link found. Paste code manually."
-        warn("Invalid URL for Auto-Fetch.")
+        warn("Invalid URL for Auto-Fetch.") -- Sử dụng warn
     end
 end
 
@@ -212,7 +213,7 @@ local function RefreshScriptList()
     scriptList.CanvasSize = UDim2.new(0,0,0, (count*44)+8)
 end
 
--- Save/Update script from editor to store (Giữ nguyên)
+-- Save/Update script from editor to store 
 btnSaveScript.MouseButton1Click:Connect(function()
     local nm = nameBox.Text:match("^%s*(.-)%s*$") or "Untitled"
     local lk = linkBox.Text:match("^%s*(.-)%s*$") or ""
@@ -228,7 +229,7 @@ btnSaveScript.MouseButton1Click:Connect(function()
     RefreshScriptList()
 end)
 
--- Fetch URL -> Editor (manual fetch; Giữ nguyên)
+-- Fetch URL -> Editor (manual fetch)
 btnFetch.MouseButton1Click:Connect(function()
     local lk = linkBox.Text or ""
     if lk:match("^https?://") then
@@ -244,7 +245,7 @@ btnFetch.MouseButton1Click:Connect(function()
     end
 end)
 
--- Execute button (runs only editor code) - safe wrapper (Giữ nguyên)
+-- Execute button (runs only editor code) - safe wrapper
 btnExecute.MouseButton1Click:Connect(function()
     local code = codeBox.Text or ""
     if code:match("^%s*$") then
@@ -271,7 +272,7 @@ btnExecute.MouseButton1Click:Connect(function()
     end
 end)
 
--- Export/Import handlers (Giữ nguyên)
+-- Export/Import handlers
 btnExport.MouseButton1Click:Connect(function()
     local txt = ExportScripts()
     if txt then
@@ -301,7 +302,7 @@ btnImport.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Color presets UI (bottom-left, Giữ nguyên)
+-- Color presets UI 
 local cpLabel = New("TextLabel", {Parent = Main, Size=UDim2.new(0,200,0,20), Position=UDim2.new(0,20,1,-36), BackgroundTransparency=1, Text="Theme Presets:", Font=Enum.Font.GothamBold, TextColor3=Theme.Text})
 local presets = {
     Purple = {Primary=Color3.fromRGB(56,20,100), Accent=Color3.fromRGB(170,84,255), Text=Color3.fromRGB(240,240,255), Bg=Color3.fromRGB(12,8,20)},
@@ -325,7 +326,7 @@ for k,v in pairs(presets) do
     px = px + 74
 end
 
--- Toggle with key K (Giữ nguyên)
+-- Toggle with key K
 local visible = true
 local function SetVisible(v)
     visible = v
@@ -342,4 +343,4 @@ RefreshGameButtons()
 RefreshScriptList()
 SetVisible(true)
 
-print("THAIDUI V3.9 loaded (TẢI CODE TỰ ĐỘNG). Toggle với K.")
+print("THAIDUI V3.10 loaded (Fix Compat). Toggle với K.")
