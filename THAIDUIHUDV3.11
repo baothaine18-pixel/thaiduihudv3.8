@@ -1,7 +1,7 @@
 --========================================================--
---======  THAIDUI HUB V3.10 – TĂNG CƯỜNG TƯƠNG THÍCH =======--
+--======  THAIDUI HUB V3.11 – TỐI GIẢN & CHỈ CODE ========--
 --========================================================--
--- Fix: Tối ưu hóa cách lấy PlayerGui và sử dụng print/warn thay cho Log (để tránh lỗi nếu hàm Log bị hỏng)
+-- Dành cho Executor lỗi. Chỉ load code TỪ TRONG SCRIPTSTORE.
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -9,13 +9,13 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 
--- Sử dụng cách tham chiếu trực tiếp PlayerGui
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer.PlayerGui or LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui") -- Dùng WaitForChild an toàn hơn
+-- local PlayerGui = LocalPlayer.PlayerGui 
 
 
 -- CONFIG
-local UI_NAME = "THAIDUI_V3_10"
+local UI_NAME = "THAIDUI_V3_11"
 local TOGGLE_KEY = Enum.KeyCode.K
 local DEFAULT_THEME = {
     Primary = Color3.fromRGB(56,20,100), 
@@ -40,37 +40,33 @@ local function New(class, props)
 end
 
 -- ===================================
--- 📚 ScriptStore (DANH SÁCH CẬP NHẬT TỪ V3.9)
+-- 📚 ScriptStore (CODE CỨNG VÀO SCRIPTSTORE)
 -- ===================================
+-- Chú ý: Các link này sẽ không được fetch tự động mà CHỈ LƯU LINK. 
+-- Bạn phải Fetch thủ công hoặc dùng code cứng.
 local ScriptStore = {
     -- 💎 BLOX FRUITS
     {game="Blox Fruits", name="Gravity Hub (Main)", link="https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua", code="-- Load link into editor using Fetch button"},
     {game="Blox Fruits", name="BlueX Hub (BF)", link="https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua", code="-- Load link into editor using Fetch button"},
     {game="Blox Fruits", name="Neva Hub (BF)", link="https://raw.githubusercontent.com/NevaHubDEV/Loader/main/NevaBF.lua", code="-- Load link into editor using Fetch button"},
     {game="Blox Fruits", name="Void Hub (BF)", link="https://raw.githubusercontent.com/VoidMasterScript/VoidHub/main/Loader.lua", code="-- Load link into editor using Fetch button"},
-    {game="Blox Fruits", name="Fusion Hub (BF)", link="https://raw.githubusercontent.com/FusionHubDev/Fusion/main/BloxFruit.lua", code="-- Load link into editor using Fetch button"},
-    {game="Blox Fruits", name="Master Hub (BF)", link="https://raw.githubusercontent.com/KiddoHiru/BloxFruits/main/MasterHub.lua", code="-- Load link into editor using Fetch button"},
-    {game="Blox Fruits", name="W-Azure (Paid/Free)", link="https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua", code="-- Load link into editor using Fetch button"},
-    {game="Blox Fruits", name="Sakura Hub (BF)", link="https://raw.githubusercontent.com/SakuraScripts/Loader/main/SakuraBF.lua", code="-- Load link into editor using Fetch button"},
-    {game="Blox Fruits", name="Kaitun Script", link="https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/refs/heads/main/KaitunBloxFruit.lua", code="-- Load link into editor using Fetch button"},
-    {game="Blox Fruits", name="Quantum Onyx", link="https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua", code="-- Load link into editor using Fetch button"},
+    -- Chạy code đơn giản (đã fetch sẵn) để test
+    {game="Blox Fruits", name="Test Print", link="", code='print("ScriptTest: Blox Fruits Loaded")'},
 
     -- 🌱 PLANTS VS BRAINROTS
     {game="Plants vs Brainrots", name="Speed Hub X", link="https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", code="-- Load link into editor using Fetch button"},
-    {game="Plants vs Brainrots", name="Mega Farm (PvB)", link="https://raw.githubusercontent.com/test/Pvb/main/Farm.lua", code="-- Load link into editor using Fetch button"},
     {game="Plants vs Brainrots", name="PvB Cheat (Old)", link="https://pastebin.com/raw/pTfC8t7m", code="-- Load link into editor using Fetch button"},
-    {game="Plants vs Brainrots", name="Zetex Hub (PvB)", link="https://raw.githubusercontent.com/Korepi/roblox/main/zetex", code="-- Load link into editor using Fetch button"},
+    {game="Plants vs Brainrots", name="Test Print PvB", link="", code='print("ScriptTest: Plants vs Brainrots Loaded")'},
     
     -- 🚓 CƯỚP 1 BRAINROTS
     {game="Cướp 1 Brainrots", name="Luin Lớn (Loader)", link="http://luminon.top/loader.lua", code="-- Load link into editor using Fetch button"},
-    {game="Cướp 1 Brainrots", name="Luin Nhỏ (Mini)", link="http://luminon.top/mini.lua", code="-- Load link into editor using Fetch button"},
     {game="Cướp 1 Brainrots", name="Theft Hub (Loader)", link="https://raw.githubusercontent.com/TheftHub/Loader/main/Loader.lua", code="-- Load link into editor using Fetch button"},
-    {game="Cướp 1 Brainrots", name="Vietnam Hub (C1B)", link="https://raw.githubusercontent.com/replit8173/VietnamHub/refs/heads/main/VietnamseHub.lua", code="-- Load link into editor using Fetch button"},
+    {game="Cướp 1 Brainrots", name="Test Print C1B", link="", code='print("ScriptTest: Cướp 1 Brainrots Loaded")'},
 }
 
 local Theme = { Primary=DEFAULT_THEME.Primary, Accent=DEFAULT_THEME.Accent, Text=DEFAULT_THEME.Text, Bg=DEFAULT_THEME.Bg }
 
--- Save/Load helpers
+-- Save/Load helpers (Giữ nguyên)
 local function ExportScripts()
     local ok, txt = pcall(function() return HttpService:JSONEncode(ScriptStore) end)
     if ok then return txt else return nil end
@@ -84,7 +80,7 @@ local function ImportScripts(json)
     return false
 end
 
--- Build ScreenGui 
+-- Build ScreenGui (Giữ nguyên)
 local screenGui = New("ScreenGui", {Name = UI_NAME, Parent = PlayerGui, ResetOnSpawn=false, ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
 local Lighting = game:GetService("Lighting")
 local blur = Lighting:FindFirstChild("THAIDUI_Blur")
@@ -102,8 +98,8 @@ Main.Active = true
 Main.Draggable = true
 
 -- Top title + glowing text 
-local Title = New("TextLabel", {Parent = Main, Size = UDim2.new(1,0,0,56), BackgroundTransparency=1, Text="THAIDUI V3.10", Font=Enum.Font.GothamBlack, TextSize=26, TextColor3=Theme.Text, ZIndex=51, TextXAlignment=Enum.TextXAlignment.Left, Position=UDim2.new(0,20,0,12)})
-local Sub = New("TextLabel", {Parent = Main, Size = UDim2.new(1,-40,0,18), Position = UDim2.new(0,20,0,42), BackgroundTransparency=1, Text="Fix Tương Thích • Tải Code Tự Động • Toggle K", Font=Enum.Font.Code, TextSize=12, TextColor3=Theme.Text})
+local Title = New("TextLabel", {Parent = Main, Size = UDim2.new(1,0,0,56), BackgroundTransparency=1, Text="THAIDUI V3.11", Font=Enum.Font.GothamBlack, TextSize=26, TextColor3=Theme.Text, ZIndex=51, TextXAlignment=Enum.TextXAlignment.Left, Position=UDim2.new(0,20,0,12)})
+local Sub = New("TextLabel", {Parent = Main, Size = UDim2.new(1,-40,0,18), Position = UDim2.new(0,20,0,42), BackgroundTransparency=1, Text="Tối Giản • Bỏ Auto Fetch • Toggle K", Font=Enum.Font.Code, TextSize=12, TextColor3=Theme.Text})
 local glow = New("TextLabel", {Parent = Main, Size=Title.Size, Position=Title.Position, BackgroundTransparency=1, Text=Title.Text, Font=Title.Font, TextSize=Title.TextSize, TextColor3=Theme.Accent, TextTransparency=1})
 task.spawn(function()
     while true do
@@ -166,23 +162,6 @@ New("UICorner", {Parent = btnExport, CornerRadius=UDim.new(0,6)})
 local btnImport = New("TextButton", {Parent = editor, Size=UDim2.new(0,130,0,28), Position=UDim2.new(0,140,1,-100), Text="Import JSON", BackgroundColor3=Color3.fromRGB(40,40,60), Font=Enum.Font.Gotham, TextColor3=Theme.Text})
 New("UICorner", {Parent = btnImport, CornerRadius=UDim.new(0,6)})
 
--- Tự động Fetch (Lấy Code) từ Link
-local function AutoFetchScript(lk)
-    if lk and lk:match("^https?://") then
-        local ok, res = pcall(function() return game:HttpGet(lk) end)
-        if ok and res and res ~= "" then
-            codeBox.Text = res
-            warn("Auto-Fetched content into editor (review before Execute).") -- Sử dụng warn
-        else
-            codeBox.Text = "-- [ERROR] Failed to Auto-Fetch URL or empty content. Paste code manually."
-            warn("Failed to Auto-Fetch URL or empty content.") -- Sử dụng warn
-        end
-    else
-        codeBox.Text = "-- No valid link found. Paste code manually."
-        warn("Invalid URL for Auto-Fetch.") -- Sử dụng warn
-    end
-end
-
 -- Script list rendering & helpers
 local selectedIndex = nil
 local function RefreshScriptList()
@@ -197,15 +176,14 @@ local function RefreshScriptList()
                 selectedIndex = i
                 nameBox.Text = s.name or ""
                 linkBox.Text = s.link or ""
-                
-                -- BẤM CHỌN SCRIPT --> TỰ ĐỘNG TẢI (FETCH) CODE
-                AutoFetchScript(s.link)
+                codeBox.Text = s.code or "" -- Lấy code cứng từ ScriptStore
+                warn("Code loaded from ScriptStore. Use Execute or Fetch Link manually.")
             end)
-            -- small copy link button (giữ nguyên, nếu muốn)
+            -- small copy link button 
             local copyBtn = New("TextButton", {Parent = btn, Size=UDim2.new(0,42,1,0), Position=UDim2.new(1,-46,0,0), Text="Link", Font=Enum.Font.Gotham, TextSize=12, BackgroundColor3=Color3.fromRGB(90,30,140), TextColor3=Theme.Text})
             New("UICorner", {Parent = copyBtn, CornerRadius=UDim.new(0,6)})
             copyBtn.MouseButton1Click:Connect(function()
-                codeBox.Text = "-- Link copied into editor; use Fetch button or click the script again to load content\n-- Link: "..tostring(s.link)
+                codeBox.Text = "-- Link copied into editor. Use Fetch button to load content.\n-- Link: "..tostring(s.link)
                 linkBox.Text = s.link or ""
             end)
         end
@@ -343,4 +321,4 @@ RefreshGameButtons()
 RefreshScriptList()
 SetVisible(true)
 
-print("THAIDUI V3.10 loaded (Fix Compat). Toggle với K.")
+print("THAIDUI V3.11 loaded (MINIMAL). Toggle với K.")
